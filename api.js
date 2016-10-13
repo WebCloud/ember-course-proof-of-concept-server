@@ -126,4 +126,20 @@ router.get(
   }
 )
 
+router.delete(
+  '/users/:userId',
+  function *(){
+    const userId = this.params.userId;
+    const User = require('./db/models/user');
+
+    const deleted = yield User.destroy({
+      where: {
+        id: userId
+      }
+    });
+
+    this.body = { meta: { deleted } };
+  }
+);
+
 module.exports = router.routes();
