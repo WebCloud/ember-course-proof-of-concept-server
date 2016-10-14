@@ -27,7 +27,7 @@ if (!!runtime && runtime === 'dev') {
 }
 
 // user CORS
-app.use(cors());
+app.use(cors({ methods: ['GET', 'PATCH', 'PUT', 'POST', 'DELETE'] }));
 
 // hook our API into the stack
 app.use(api);

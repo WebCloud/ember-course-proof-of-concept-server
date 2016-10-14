@@ -34,7 +34,6 @@ router.post(
   '/users',
   koaBody(),
   function *(){
-    console.log(JSON.stringify(this.request.fields));
     const data = this.request.fields.data;
     if (typeof data === 'undefined') {
       this.body = {
@@ -124,7 +123,55 @@ router.get(
       };
     }
   }
-)
+);
+
+router.patch(
+  '/users/:userId',
+  koaBody(),
+  function *(){
+    const data = this.request.fields.data;
+    if (typeof data === 'undefined') {
+      this.body = {
+        data: { }
+      };
+
+      return;
+    }
+
+    const userId = this.params.userId;
+    const email = data.attributes.email;
+    const name = data.attributes.name;
+    const password = data.attributes.password;
+    const User = require('./db/models/user');
+
+    if (typeof password === 'undefined'
+      || typeof email === 'undefined'
+      || typeof name === 'undefined') {
+        this.body = {
+          data: { }
+        };
+
+        return;
+    }
+
+    const user = yield User.update(data.attributes, {
+      where: {
+        id: userId
+      }
+    });
+
+    if (user != null) {
+      this.body = {
+        meta: { message: 'updated' }
+      };
+    } else {
+      this.body = {
+        data: { }
+      };
+    }
+
+  }
+);
 
 router.delete(
   '/users/:userId',
