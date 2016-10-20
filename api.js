@@ -2,35 +2,8 @@
 
 const router = require('koa-router')();
 const koaBody = require('koa-better-body');
-const uploadDir = `${__dirname}/uploads`;
-
-router.post(
-  '/upload',
-  koaBody({
-    multipart: true,
-    formLimit: '1gb',
-    formidable: {
-      uploadDir,
-      keepExtensions: true
-    }
-  }),
-  function *assetUploadEndpoint() {
-    const uploaded = this.request.body.files.asset;
-    const fileName = uploaded.path.replace(uploadDir, '');
-    const image = `/img/psd_export${fileName}`;
-    const User = require('./db/models/user');
-
-    const asset = yield Asset.create({
-      imagePath: image
-    });
-
-    this.body = {
-      image
-    };
-  }
-);
-
 const db = require('./db/index');
+
 db.sync();
 
 router.post(
