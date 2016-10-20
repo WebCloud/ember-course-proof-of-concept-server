@@ -40,7 +40,7 @@ router.post(
     const data = this.request.fields.data;
     if (typeof data === 'undefined') {
       this.body = {
-        data: { }
+        data: null
       };
 
       return;
@@ -55,7 +55,7 @@ router.post(
       || typeof email === 'undefined'
       || typeof name === 'undefined') {
         this.body = {
-          data: { }
+          data: null
         };
 
         return;
@@ -75,7 +75,7 @@ router.post(
       };
     } else {
       this.body = {
-        data: { }
+        data: null
       };
     }
   }
@@ -98,7 +98,7 @@ router.get(
 
     if (typeof email === 'undefined') {
       this.body = {
-        data: { }
+        data: null
       };
 
       return;
@@ -123,12 +123,12 @@ router.get(
         };
       } else {
         this.body = {
-          data: { }
+          data: null
         };
       }
     } catch (e) {
       this.body = {
-        data: { }
+        data: null
       };
     }
   }
@@ -141,7 +141,7 @@ router.patch(
     const data = this.request.fields.data;
     if (typeof data === 'undefined') {
       this.body = {
-        data: { }
+        data: null
       };
 
       return;
@@ -157,7 +157,7 @@ router.patch(
       || typeof email === 'undefined'
       || typeof name === 'undefined') {
         this.body = {
-          data: { }
+          data: null
         };
 
         return;
@@ -175,7 +175,7 @@ router.patch(
       };
     } else {
       this.body = {
-        data: { }
+        data: null
       };
     }
 
