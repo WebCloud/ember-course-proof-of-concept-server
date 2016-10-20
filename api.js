@@ -30,6 +30,9 @@ router.post(
   }
 );
 
+const db = require('./db/index');
+db.sync();
+
 router.post(
   '/users',
   koaBody(),
@@ -105,19 +108,25 @@ router.get(
       where: params
     };
 
-    const user = yield User.findOne(query);
-    if (user != null) {
-      this.body = {
-        data: {
-          type: 'users',
-          id: user.id,
-          attributes: {
-            name: user.name,
-            email: user.email
+    try {
+      const user = yield User.findOne(query);
+      if (user != null) {
+        this.body = {
+          data: {
+            type: 'users',
+            id: user.id,
+            attributes: {
+              name: user.name,
+              email: user.email
+            }
           }
-        }
-      };
-    } else {
+        };
+      } else {
+        this.body = {
+          data: { }
+        };
+      }
+    } catch (e) {
       this.body = {
         data: { }
       };
