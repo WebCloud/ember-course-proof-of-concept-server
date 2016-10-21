@@ -4,8 +4,6 @@ const router = require('koa-router')();
 const koaBody = require('koa-better-body');
 const db = require('./db/index');
 
-db.sync();
-
 router.post(
   '/users',
   koaBody(),
@@ -23,6 +21,8 @@ router.post(
     const name = data.attributes.name;
     const password = data.attributes.password;
     const User = require('./db/models/user');
+
+    yield db.sync();
 
     if (typeof password === 'undefined'
       || typeof email === 'undefined'
@@ -60,6 +60,8 @@ router.get(
     const email = this.query.email;
     const password = this.query.password;
     const User = require('./db/models/user');
+
+    yield db.sync();
 
     const params = { email };
 
@@ -126,6 +128,8 @@ router.patch(
     const password = data.attributes.password;
     const User = require('./db/models/user');
 
+    yield db.sync();
+
     if (typeof password === 'undefined'
       || typeof email === 'undefined'
       || typeof name === 'undefined') {
@@ -160,6 +164,8 @@ router.delete(
   function *(){
     const userId = this.params.userId;
     const User = require('./db/models/user');
+
+    yield db.sync();
 
     const deleted = yield User.destroy({
       where: {
