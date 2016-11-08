@@ -4,6 +4,8 @@ const router = require('koa-router')();
 const koaBody = require('koa-better-body');
 const db = require('./db/index');
 
+// Users
+
 router.post(
   '/users',
   koaBody(),
@@ -170,6 +172,189 @@ router.delete(
     const deleted = yield User.destroy({
       where: {
         id: userId
+      }
+    });
+
+    this.body = { meta: { deleted } };
+  }
+);
+
+
+// Todos
+
+router.post(
+  '/todos',
+  koaBody(),
+  function *(){
+    const data = this.request.fields.data;
+    if (typeof data === 'undefined') {
+      this.body = {
+        data: null
+      };
+
+      return;
+    }
+
+    const title = data.attributes.title;
+    const isDone = false;
+    let userId = undefined;
+
+    try {
+      userId = data.relationships.user.data.id;
+    } catch (e) {
+      this.body = {
+        data: null
+      };
+
+      return;
+    }
+
+    const Todo = require('./db/models/todo');
+    const User = require('./db/models/user');
+
+    yield db.sync();
+
+    if (typeof title === 'undefined') {
+        this.body = {
+          data: null
+        };
+
+        return;
+    }
+
+    const todo = yield Todo.create({ title, isDone, userId }, { include: [User] });
+    if (todo != null) {
+      this.body = {
+        data: {
+          type: 'todos',
+          id: todo.id,
+          attributes: {
+            title: todo.title,
+            isDone: todo.isDone
+          },
+          relationships: {
+            user: {
+              data: {
+                type: 'users',
+                id: userId
+              }
+            }
+          }
+        }
+      };
+    } else {
+      this.body = {
+        data: null
+      };
+    }
+  }
+);
+
+router.get(
+  '/todos',
+  function *(){
+    const userId = this.query.userId;
+
+    const Todo = require('./db/models/todo');
+    const User = require('./db/models/user');
+
+    yield db.sync();
+
+    if (typeof userId === 'undefined') {
+      this.body = {
+        data: []
+      };
+
+      return;
+    }
+
+    try {
+      const todos = yield Todo.findAll({
+        include: [{
+          model: User,
+          where: { id: userId }
+        }]
+      }).then((list) => list.map((todo) => ({
+        type: 'todos',
+        id: todo.id,
+        attributes: {
+          title: todo.title
+        }
+      })));
+
+      if (todos != null) {
+        this.body = { data: todos };
+      } else {
+        this.body = {
+          data: []
+        };
+      }
+    } catch (e) {
+      console.log(e);
+      this.body = {
+        data: []
+      };
+    }
+  }
+);
+
+router.patch(
+  '/todos/:postId',
+  koaBody(),
+  function *(){
+    const data = this.request.fields.data;
+    if (typeof data === 'undefined') {
+      this.body = {
+        data: null
+      };
+
+      return;
+    }
+
+    const postId = this.params.postId;
+    const title = data.attributes.title;
+    const Todo = require('./db/models/todo');
+
+    yield db.sync();
+
+    if (typeof title === 'undefined') {
+        this.body = {
+          data: null
+        };
+
+        return;
+    }
+
+    const todo = yield Todo.update(data.attributes, {
+      where: {
+        id: postId
+      }
+    });
+
+    if (todo != null) {
+      this.body = {
+        meta: { message: 'updated' }
+      };
+    } else {
+      this.body = {
+        data: null
+      };
+    }
+
+  }
+);
+
+router.delete(
+  '/todos/:todoId',
+  function *(){
+    const todoId = this.params.todoId;
+    const Todo = require('./db/models/todo');
+
+    yield db.sync();
+
+    const deleted = yield Todo.destroy({
+      where: {
+        id: todoId
       }
     });
 
