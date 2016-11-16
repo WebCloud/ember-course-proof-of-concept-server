@@ -222,7 +222,7 @@ router.post(
         return;
     }
 
-    const todo = yield Todo.create({ title, isDone, userId }, { include: [User] });
+    const todo = yield Todo.create({ title, 'is-done': isDone, userId }, { include: [User] });
     if (todo != null) {
       this.body = {
         data: {
@@ -277,9 +277,7 @@ router.get(
       }).then((list) => list.map((todo) => ({
         type: 'todos',
         id: todo.id,
-        attributes: {
-          title: todo.title
-        }
+        attributes: todo
       })));
 
       if (todos != null) {
@@ -299,7 +297,7 @@ router.get(
 );
 
 router.patch(
-  '/todos/:postId',
+  '/todos/:todoId',
   koaBody(),
   function *(){
     const data = this.request.fields.data;
@@ -311,7 +309,7 @@ router.patch(
       return;
     }
 
-    const postId = this.params.postId;
+    const todoId = this.params.todoId;
     const title = data.attributes.title;
     const Todo = require('./db/models/todo');
 
@@ -327,7 +325,7 @@ router.patch(
 
     const todo = yield Todo.update(data.attributes, {
       where: {
-        id: postId
+        id: todoId
       }
     });
 
